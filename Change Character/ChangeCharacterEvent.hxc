@@ -5,7 +5,7 @@ import funkin.play.character.BaseCharacter;
 import funkin.play.character.CharacterDataParser;
 import funkin.play.event.ScriptedSongEvent;
 import funkin.play.PlayState;
-import Reflect;
+//import Reflect;
 
 /**
  * @author MayoOddToSee
@@ -21,7 +21,7 @@ class ChangeCharacterEvent extends ScriptedSongEvent {
 		super('Change Character');
 	}
 
-	function getEventSchema() {
+	override function getEventSchema() {
 		var map = ["Boyfriend" => BF, "Dad" => DAD, "Girlfriend" => GF,];
 
 		var charMap = ["Boyfriend" => "bf"];
@@ -47,7 +47,7 @@ class ChangeCharacterEvent extends ScriptedSongEvent {
 		];
 	}
 
-	function handleEvent(data) {
+	override function handleEvent(data) {
 		if (data.value != null) {
 			dataValue = data.value;
 			var target = getValue('target', BF);
@@ -68,7 +68,7 @@ class ChangeCharacterEvent extends ScriptedSongEvent {
 
 	//helper function
 	function getValue(field:String, def:Dynamic) {
-		var value = Reflect.field(dataValue, field);
+		var value = Type.resolveClass("Reflect").field(dataValue, field);
 		if (value == null)
 			return def;
 		else
@@ -141,6 +141,7 @@ class ChangeCharacterHandler extends Module {
 
 	function replaceChar(characterType:CharacterType, characterTypeString:String, char:BaseCharacter) {
 		var old = PlayState.instance.currentStage.getCharacter(characterTypeString);
+		if(old == char) return;
 		var index = PlayState.instance.currentStage.members.indexOf(old);
 		PlayState.instance.remove(char);
 		PlayState.instance.currentStage.remove(old);
@@ -163,7 +164,7 @@ class ChangeCharacterHandler extends Module {
 	var defaults:Array<BaseCharacter> = [];
 	override function onUpdate(e) {
 		super.onUpdate(e);
-		if(PlayState.instance != null && !PlayState.instance.isMinimalMode && !ok) {
+		if(PlayState.instance != null && !PlayState.instance.isMinimalMode && PlayState.instance.currentStage != null && !ok) {
 			ok = true;
 			var i = 0;
 			for(char in [PlayState.instance.currentStage.getBoyfriend(), PlayState.instance.currentStage.getDad(), PlayState.instance.currentStage.getGirlfriend()]) {
@@ -173,8 +174,9 @@ class ChangeCharacterHandler extends Module {
 			}
 			for(event in PlayState.instance.songEvents) {
 				if(event.value != null) {
-					var char = Reflect.field(event.value, 'char');
-					var target = Reflect.field(event.value, 'target');
+					//??????????????????
+					var char = Type.resolveClass("Reflect").field(event.value, 'char');
+					var target = Type.resolveClass("Reflect").field(event.value, 'target');
 					if(char != null && target != null && !chars[target].exists(char)) {
 						var hi = CharacterDataParser.fetchCharacter(char);
 						chars[strid.indexOf(target)].set(char, hi);
