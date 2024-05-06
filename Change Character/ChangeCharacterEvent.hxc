@@ -122,7 +122,7 @@ class ChangeCharacterHandler extends Module {
 		}
     }
 
-	static function changeCharacter(character:String, characterType:CharacterType, characterTypeString:String) {
+	function changeCharacter(character:String, characterType:CharacterType, characterTypeString:String) {
 		var id = tid.indexOf(characterType);
 		var char = chars[id].get(character);
 		if(char == null) {
