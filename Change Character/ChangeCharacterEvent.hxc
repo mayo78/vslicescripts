@@ -50,10 +50,6 @@ class ChangeCharacterEvent extends ScriptedSongEvent {
 		];
 	}
 
-    public override function getTitle():String
-    {
-      return "Change Character (Redux, dont use this one)";
-    }
 	override function handleEvent(data) {
 		if (data.value != null) {
 			dataValue = data.value;
@@ -165,7 +161,7 @@ class ChangeCharacterHandler extends Module {
 	function hideChar(char:BaseCharacter) {
 		char.alpha = .00001;
 		char.scrollFactor.set();
-		char.x += 20000000;
+		char.screenCenter();
 		PlayState.instance.add(char);
 	}
 
