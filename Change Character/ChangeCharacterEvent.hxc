@@ -5,16 +5,18 @@ import funkin.play.character.BaseCharacter;
 import funkin.play.character.CharacterDataParser;
 import funkin.play.event.ScriptedSongEvent;
 import funkin.play.PlayState;
-import openfl.utils.Assets;
+import funkin.util.FunkinTypeResolver;
 //import Reflect;
 
 /**
  * @author MayoOddToSee
  */
 class ChangeCharacterEvent extends ScriptedSongEvent {
-	static var BF = 'bf'; //does static even do or mean anything lol
-	static var DAD = 'dad';
-	static var GF = 'gf';
+	var BF = 'bf';
+	var DAD = 'dad';
+	var GF = 'gf';
+
+	var typeResolver:FunkinTypeResolver = new FunkinTypeResolver();
 	
 	var dataValue:Dynamic;
 
@@ -48,6 +50,10 @@ class ChangeCharacterEvent extends ScriptedSongEvent {
 		];
 	}
 
+    public override function getTitle():String
+    {
+      return "Change Character (Redux, dont use this one)";
+    }
 	override function handleEvent(data) {
 		if (data.value != null) {
 			dataValue = data.value;
@@ -69,7 +75,7 @@ class ChangeCharacterEvent extends ScriptedSongEvent {
 
 	//helper function
 	function getValue(field:String, def:Dynamic) {
-		var value = Assets.resolveClass("Reflect").field(dataValue, field);
+		var value = typeResolver.resolveClass("Reflect").field(dataValue, field);
 		if (value == null)
 			return def;
 		else
@@ -90,6 +96,8 @@ class ChangeCharacterHandler extends Module {
 	var charsFetched:Array<String> = [];
 	var strid:Array<String> = ['bf', 'dad', 'gf'];
 	var tid:Array<CharacterType> = [CharacterType.BF, CharacterType.DAD, CharacterType.GF];
+
+	var typeResolver:FunkinTypeResolver = new FunkinTypeResolver();
 
 	public function new() {
 		super('change-character-handler');
@@ -157,7 +165,7 @@ class ChangeCharacterHandler extends Module {
 	function hideChar(char:BaseCharacter) {
 		char.alpha = .00001;
 		char.scrollFactor.set();
-		char.screenCenter();
+		char.x += 20000000;
 		PlayState.instance.add(char);
 	}
 
@@ -177,8 +185,8 @@ class ChangeCharacterHandler extends Module {
 			for(event in PlayState.instance.songEvents) {
 				if(event.value != null) {
 					//??????????????????
-					var char = Assets.resolveClass("Reflect").field(event.value, 'char');
-					var target = Assets.resolveClass("Reflect").field(event.value, 'target');
+					var char = typeResolver.resolveClass("Reflect").field(event.value, 'char');
+					var target = typeResolver.resolveClass("Reflect").field(event.value, 'target');
 					if(char != null && target != null && !chars[target].exists(char)) {
 						var hi = CharacterDataParser.fetchCharacter(char);
 						chars[strid.indexOf(target)].set(char, hi);
