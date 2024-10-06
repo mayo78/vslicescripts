@@ -5,8 +5,7 @@ import funkin.play.character.BaseCharacter;
 import funkin.play.character.CharacterDataParser;
 import funkin.play.event.ScriptedSongEvent;
 import funkin.play.PlayState;
-import funkin.util.FunkinTypeResolver;
-//import Reflect;
+import funkin.util.ReflectUtil;
 
 /**
  * @author MayoOddToSee
@@ -15,8 +14,6 @@ class ChangeCharacterEvent extends ScriptedSongEvent {
 	var BF = 'bf';
 	var DAD = 'dad';
 	var GF = 'gf';
-
-	var typeResolver:FunkinTypeResolver = new FunkinTypeResolver();
 	
 	var dataValue:Dynamic;
 
@@ -71,7 +68,7 @@ class ChangeCharacterEvent extends ScriptedSongEvent {
 
 	//helper function
 	function getValue(field:String, def:Dynamic) {
-		var value = typeResolver.resolveClass("Reflect").field(dataValue, field);
+		var value = ReflectUtil.getAnonymousField(dataValue, field);
 		if (value == null)
 			return def;
 		else
@@ -92,8 +89,6 @@ class ChangeCharacterHandler extends Module {
 	var charsFetched:Array<String> = [];
 	var strid:Array<String> = ['bf', 'dad', 'gf'];
 	var tid:Array<CharacterType> = [CharacterType.BF, CharacterType.DAD, CharacterType.GF];
-
-	var typeResolver:FunkinTypeResolver = new FunkinTypeResolver();
 
 	public function new() {
 		super('change-character-handler');
@@ -181,8 +176,8 @@ class ChangeCharacterHandler extends Module {
 			for(event in PlayState.instance.songEvents) {
 				if(event.value != null) {
 					//??????????????????
-					var char = typeResolver.resolveClass("Reflect").field(event.value, 'char');
-					var target = typeResolver.resolveClass("Reflect").field(event.value, 'target');
+					var char = ReflectUtil.getAnonymousField(event.value, 'char');
+					var target = ReflectUtil.getAnonymousField(event.value, 'target');
 					if(char != null && target != null && !chars[target].exists(char)) {
 						var hi = CharacterDataParser.fetchCharacter(char);
 						chars[strid.indexOf(target)].set(char, hi);
